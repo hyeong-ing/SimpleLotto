@@ -4,8 +4,19 @@
 <br/>
 
 <p align="center"> 
+ 
+  <br/>
+  첫 프로젝트로 간단하게 로또 번호를 출력시키고 댓글을 남기는 기능을 만들었습니다. <br/>
+  지금 보니 너무나도 엉성하고 부족한 부분이 많이 보여 부끄럽습니다. <br/>
+  그래도 발전해나가는 그 과정 중 첫 시작이라고 생각해주시면 감사하겠습니다. <br/>
+  <br/> <br/>
+ 
 <img width="700" height="400" alt="5" src="https://github.com/user-attachments/assets/b1a6e070-3d39-4770-8e1e-488c9cf048fc" />
 </p>
+
+<br/><br/>
+
+****
 
 <br/><br/>
 
@@ -31,51 +42,122 @@
 <br/>
 
 + 사용자가 버튼을 클릭하면 로또 번호 6개를 랜덤으로 생성합니다.
-+ 사용자가 생성되 번호를 복사 가능합니다.
++ 사용자가 생성된 번호를 복사 가능합니다.
 + JPA와 H2 데이터 베이스를 이용해 댓글 데이터를 저장합니다.
-+ Sprint Boot MVC와 Thymleaf를 활용해 서버에서 화면을 렌더링합니다.
-+ 
++ Spring Boot MVC와 Thymeleaf를 활용해 서버에서 화면을 렌더링합니다.
 
 
-
-#### 2. @PostMApping을 이용하여 코드 작성
-+ 버튼을 누르면 계속 숫자가 변경되도록 만들었습니다.
-+ 브랜치 PostMapping에 코드가 등록되어있습니다.
-+ 해당 블로그 위치 : https://post-this.tistory.com/36
-  </br></br>
-****
-
-
-#### 3. H2 데이터베이스를 이용한 간단한 댓글창
-+ 1자 이상 25자 이하 댓글을 작성하는 댓글창을 만들었습니다.
-+ 간단하게 최신 등록된 댓글 10개만 출력됩니다.
-+ 브랜치 Comment에 코드가 등록되어있습니다.
-+ 해당 블로그 위치 : https://post-this.tistory.com/39
 </br></br>
 
-<img width="550" alt="스크린샷 2024-12-09 오후 9 48 10" src="https://github.com/user-attachments/assets/83696619-2346-43fd-b9fb-84cce0bb94d6">
 
-****
+### 🔶 프로젝트 구조
++ Java 17
++ Spring Boot MVC
++ Thymeleaf
++ H2 DataBase
 
-#### 4. 로또 숫자 복사하기.
-+ JavaScript를 이용하여 복사하기를 만들었습니다.
-+ 복사를 할 경우 [럭키 로또 숫자 복사 완료!] 문구가 출력됩니다.
-+ 해당 블로그 위치 : https://post-this.tistory.com/40
+
 </br></br>
 
-<img width="550" alt="스크린샷 2024-12-12 오후 8 41 47" src="https://github.com/user-attachments/assets/652513c1-8737-49f6-89d4-0f82a6f5fcd6" />
+
+### 🔶 프로젝트 목표
++ Spring MVC의 기본 요청과 응답 흐름을 이해하기
++ Controller, Service, Repository, Entity 역할 나누기
++ Controller에서 요청을 받고, Service에서 로직을 처리하고 Model을 통해 Thymeleaf 화면에 데이터 전달하기
++ @GetMapping과 @PostMapping이 어떻게 다르게 동작하는지 이해하기
 
 
-****
+</br></br>
 
-#### 5. 마무리
-+ 최종으로 댓글을 다는 기능과 복사기능이 추가된 랜덤 숫자 출력 사이트를 만들었다.
-+ 초반에 구상했던 이미지는 버튼을 누르면 랜덤숫자가 출력되고, 복사기능만 있도록 구상했다.
-  </br></br>
-<img width="550" alt="초기구상" src="https://github.com/user-attachments/assets/7aa22e00-3271-4f3d-9684-cb2210eeca8f" />
-</br>x
-+ 영상 : 
-  https://github.com/user-attachments/assets/b95cd4fe-86f5-416c-a3a8-9f182abe051b
+
+### 🔶 코드 설명
+1) 로또 번호 생성 로직
+
+<br/>
+
++ TreeSet을 사용해서 중복을 허용하지 않도록 하면서 값을 자동으로 오름차순 정렬하도록 했습니다.
+
+```
+Set<Integer> lottoSet = new TreeSet<>();
+```
+
+<br/>
+
++ 하지만 TreeSet은 인덱스로 접근할 수 없다는 특징이 있습니다. <br/>
+로또 번호는 각각 다른 원형 이미지에 하나씩 나눠 담아야해서 결국 ArrayList로 변환했습니다.
+
+```
+List<Integer> lottoList = new ArrayList<>(lottoSet);
+```
+
+<br/>
+
++ get( ) 메서드를 사용해 각 번호를 Model에 개별적으로 담아 Thymeleaf 화면으로 전달했습니다.
+
+```
+lottoList.get(0)
+lottoList.get(1)
+lottoList.get(2)
+...
+```
+```
+model.addAttribute("Number1",lottoList.get(0));
+model.addAttribute("Number2",lottoList.get(1));
+model.addAttribute("Number3",lottoList.get(2));
+...
+```
+
+<br/>
+<br/>
+
+
+2) 댓글 페이지 조회 로직
+
+<br/>
+
++ 사용자가 댓글 페이지에 들어가면 /board 요청이 발생합니다. <br/>
+그러면 컨트롤러는 boardService.get10Comments()를 호출해서 댓글 목록을 가져옵니다.
+  
+```
+@GetMapping("/board")
+public String boardPage(Model model) {
+    model.addAttribute("comments", boardService.get10Comments());
+    return "board";
+}
+```
+
+<br/>
+
++ JPA의 Pageable을 사용해 첫 번째 페이지에서 10개만 가져옵니다. <br/>
+그리고 댓글을 id 기준 내림차순으로 조회합니다.
+
+```
+public Page<Comment> get10Comments() {
+    Pageable pageable = PageRequest.of(0,10);
+    return boardRepository.findAllByOrderByIdDesc(pageable);
+}
+```   
+
+<br/>
+<br/>
+
+3) 뎃글 저장 로직
+
+<br/>
+
++ 사용자가 댓글을 입력하고 저장 버튼을 누르면 /save 요청이 발생합니다. <br/>
+@RequestParam으로 댓글 내용을 받습니다. <br/>
+그 다음 Service에서 처리 후 /board로 다시 이동을 시켜 최신 댓글 목록을 다시 조회하도록 했습니다.
+```
+@GetMapping("/save")
+public String saveComment( @RequestParam String content) {
+    boardService.saveComment(content);
+    return "redirect:/board";
+}
+```
+
+
+
 
 
 
