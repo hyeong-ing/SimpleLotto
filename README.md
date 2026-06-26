@@ -70,35 +70,51 @@
 </br></br>
 
 
-### 🔶 코드 설명
-1) 로또 번호 생성 로직
+### 🔶 문제 해결
++ TreeSet으로 받은 랜덤한 로또 번호 6자리를 하나씩 분리하기 <br/>
 
 <br/>
 
-+ TreeSet을 사용해서 중복을 허용하지 않도록 하면서 값을 자동으로 오름차순 정렬하도록 했습니다.
+TreeSet은 중복을 허용하지 않고 값을 오름차순으로 정렬할 수 있다는 장점이 있어 로또 번호 생성에 적합했습니다.<br/>
+하지만 인덱스 기반 접근을 지원하지 않아, 생성된 6개의 번호를 분리하는데 어려움이 있었습니다. <br/>
+이를 해결하기 위해 TreeSet으로 번호를 생성한 뒤 ArrayList로 변환했습니다. 중복 제거와 정렬은 유지하면서, 각 번호를 개별적으로 출력할 수 있었습니다.
+
+<br/><br/>
+
++ 화면에 보여지는 댓글을 10개로 제한하기 <br/>
+전체 댓글을 가져온 뒤 화면에서 10개만 보이게 처리하는 방식을 떠올렸습니다. <br/>
+하지만 그렇게 하면 필요하지 않은 데이터까지 모두 가져오게 되어 비효율적이라고 판단했습니다. </br>
+그래서 JPA의 Pagealbe을 사용해 조회 단계에서부터 최신 댓글 10개만 가져오도록 수정했습니다. </br>
+PageRequest.of(0, 10)으로 조회 개수를 제한하고, id 기준 내림차순으로 정렬했습니다. 
+
+<br/><br/>
+
+
+
+<br/><br/>
+
+### 🔶 문제 해결 및 핵심 로직
+1) 로또 번호 개별 출력 문제 <br/>
+로또 번호는 중복 없이 6개를 생성해야하고, 화면에서는 각 번호를 원형 영역 안에 하나씩 출력해야 했습니다.
+
+<br/>
+
++ 처음에는 중복 제거와 오름차순 정렬을 동시에 처리하기 위해 TreeSet을 사용했습니다.
 
 ```
 Set<Integer> lottoSet = new TreeSet<>();
+
+while (lottoSet.size() < 6) {
+ lottoSet.add(rd.nextInt(45) + 1); }
 ```
 
 <br/>
 
-+ 하지만 TreeSet은 인덱스로 접근할 수 없다는 특징이 있습니다. <br/>
-로또 번호는 각각 다른 원형 이미지에 하나씩 나눠 담아야해서 결국 ArrayList로 변환했습니다.
++ 하지만 TreeSet은 인덱스로 접근할 수 없다는 특징 때문에 생성된 번호를 하나씩 분리해 화면에 전달하기 어려웠습니다.
++ 이를 해결하기 위해 TreeSet을 ArrayList로 변환한 뒤, 각 번호를 Model 담아 Thymeleaf 화면으로 전달했습니다.
 
 ```
 List<Integer> lottoList = new ArrayList<>(lottoSet);
-```
-
-<br/>
-
-+ get( ) 메서드를 사용해 각 번호를 Model에 개별적으로 담아 Thymeleaf 화면으로 전달했습니다.
-
-```
-lottoList.get(0)
-lottoList.get(1)
-lottoList.get(2)
-...
 ```
 ```
 model.addAttribute("Number1",lottoList.get(0));
@@ -111,7 +127,8 @@ model.addAttribute("Number3",lottoList.get(2));
 <br/>
 
 
-2) 댓글 페이지 조회 로직
+2) 최신 댓글 10개만 조회하기 <br/>
+전체 댓글을 가져온 뒤 화면에서 10개만 보여주는 방식을 생각했지만, 조회 단계에서부터 필요한 데이터만 가져오는 것이 더 효율적이라고 생각했습니다.
 
 <br/>
 
@@ -141,23 +158,31 @@ public Page<Comment> get10Comments() {
 <br/>
 <br/>
 
-3) 뎃글 저장 로직
-
+3) 로또 번호 복사 로직
 <br/>
 
-+ 사용자가 댓글을 입력하고 저장 버튼을 누르면 /save 요청이 발생합니다. <br/>
-@RequestParam으로 댓글 내용을 받습니다. <br/>
-그 다음 Service에서 처리 후 /board로 다시 이동을 시켜 최신 댓글 목록을 다시 조회하도록 했습니다.
++ 생성된 로또 번호를 사용자가 복사할 수 있도록 JavaScript의 Clipboard API를 사용했습니다. <br/>
+번호 영역을 선택해 텍스트를 추출하고, 공백으로 연결한 뒤 클립보드에서 저장하도록 구현했습니다.
+
+``` 
+        const numbers = Array.from(document.querySelectorAll(".second h1")).map(el => el.textContent.trim());
+        const numbersString = numbers.join(" ");
 ```
-@GetMapping("/save")
-public String saveComment( @RequestParam String content) {
-    boardService.saveComment(content);
-    return "redirect:/board";
-}
 ```
-
-
-
+      navigator.clipboard.writeText(numbersString).then(() => {
+            alert("럭키 로또 숫자 복사 완료!");
+        }).catch(err => {
+            console.error("복사 실패:", err);
+            alert("복사에 실패했습니다.");
+        });
+    }
+```
+```
+    const copyImage = document.querySelector("img[alt='copy']");
+    if (copyImage) {
+        copyImage.addEventListener("click", copyNumbers);
+    }
+```
 
 
 
