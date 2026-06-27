@@ -14,11 +14,7 @@
 <img width="700" height="400" alt="5" src="https://github.com/user-attachments/assets/b1a6e070-3d39-4770-8e1e-488c9cf048fc" />
 </p>
 
-<br/><br/>
-
-
-
-<br/><br/>
+<br/><br/><br/>
 
 ### 🔶 프로젝트 관련 링크
 
