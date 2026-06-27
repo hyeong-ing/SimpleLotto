@@ -16,7 +16,7 @@
 
 <br/><br/>
 
-****
+
 
 <br/><br/>
 
@@ -70,29 +70,6 @@
 </br></br>
 
 
-### 🔶 문제 해결
-+ TreeSet으로 받은 랜덤한 로또 번호 6자리를 하나씩 분리하기 <br/>
-
-<br/>
-
-TreeSet은 중복을 허용하지 않고 값을 오름차순으로 정렬할 수 있다는 장점이 있어 로또 번호 생성에 적합했습니다.<br/>
-하지만 인덱스 기반 접근을 지원하지 않아, 생성된 6개의 번호를 분리하는데 어려움이 있었습니다. <br/>
-이를 해결하기 위해 TreeSet으로 번호를 생성한 뒤 ArrayList로 변환했습니다. 중복 제거와 정렬은 유지하면서, 각 번호를 개별적으로 출력할 수 있었습니다.
-
-<br/><br/>
-
-+ 화면에 보여지는 댓글을 10개로 제한하기 <br/>
-전체 댓글을 가져온 뒤 화면에서 10개만 보이게 처리하는 방식을 떠올렸습니다. <br/>
-하지만 그렇게 하면 필요하지 않은 데이터까지 모두 가져오게 되어 비효율적이라고 판단했습니다. </br>
-그래서 JPA의 Pagealbe을 사용해 조회 단계에서부터 최신 댓글 10개만 가져오도록 수정했습니다. </br>
-PageRequest.of(0, 10)으로 조회 개수를 제한하고, id 기준 내림차순으로 정렬했습니다. 
-
-<br/><br/>
-
-
-
-<br/><br/>
-
 ### 🔶 문제 해결 및 핵심 로직
 1) 로또 번호 개별 출력 문제 <br/>
 로또 번호는 중복 없이 6개를 생성해야하고, 화면에서는 각 번호를 원형 영역 안에 하나씩 출력해야 했습니다.
@@ -126,14 +103,14 @@ model.addAttribute("Number3",lottoList.get(2));
 <br/>
 <br/>
 
+----
 
 2) 최신 댓글 10개만 조회하기 <br/>
 전체 댓글을 가져온 뒤 화면에서 10개만 보여주는 방식을 생각했지만, 조회 단계에서부터 필요한 데이터만 가져오는 것이 더 효율적이라고 생각했습니다.
 
 <br/>
 
-+ 사용자가 댓글 페이지에 들어가면 /board 요청이 발생합니다. <br/>
-그러면 컨트롤러는 boardService.get10Comments()를 호출해서 댓글 목록을 가져옵니다.
++ 그래서 Spring Data JPA의 pageable을 사용해 최신 댓글 10개만 조회하도록 구현했습니다.
   
 ```
 @GetMapping("/board")
@@ -142,49 +119,101 @@ public String boardPage(Model model) {
     return "board";
 }
 ```
-
-<br/>
-
-+ JPA의 Pageable을 사용해 첫 번째 페이지에서 10개만 가져옵니다. <br/>
-그리고 댓글을 id 기준 내림차순으로 조회합니다.
++ PageRequest.of(0, 10)으로 조회 개수를 10개로 제한하고, id 기준 내림차순 정렬을 사용해 최신 댓글부터 가져오도록 했습니다.
 
 ```
 public Page<Comment> get10Comments() {
     Pageable pageable = PageRequest.of(0,10);
     return boardRepository.findAllByOrderByIdDesc(pageable);
 }
-```   
+```
+```
+public interface BoardRepository extends JpaRepository<Comment, Long> { Page<Comment> findAllByOrderByIdDesc(Pageable pageable); }
+```
 
 <br/>
 <br/>
 
-3) 로또 번호 복사 로직
+----
+
+3) 댓글 길이 검증 <br/>
+댓글은 짧은 한 줄 댓글 형태로 사용하기 위해 1자 이상 25자 이하만 저장되도록 제한했습니다.
+
 <br/>
 
-+ 생성된 로또 번호를 사용자가 복사할 수 있도록 JavaScript의 Clipboard API를 사용했습니다. <br/>
-번호 영역을 선택해 텍스트를 추출하고, 공백으로 연결한 뒤 클립보드에서 저장하도록 구현했습니다.
++ 화면에서는 maxlength를 사용해 입력 길이를 제한했습니다.
 
 ``` 
-        const numbers = Array.from(document.querySelectorAll(".second h1")).map(el => el.textContent.trim());
-        const numbersString = numbers.join(" ");
-```
-```
-      navigator.clipboard.writeText(numbersString).then(() => {
-            alert("럭키 로또 숫자 복사 완료!");
-        }).catch(err => {
-            console.error("복사 실패:", err);
-            alert("복사에 실패했습니다.");
-        });
-    }
-```
-```
-    const copyImage = document.querySelector("img[alt='copy']");
-    if (copyImage) {
-        copyImage.addEventListener("click", copyNumbers);
-    }
+<input class="write"
+       type="text"
+       name="content"
+       placeholder="짧은 댓글 남기기 (25자이내)"
+       maxlength="25">
 ```
 
++ 서버에서도 한 번 더 길이를 검증해 조건에 맞는 댓글만 저장하도록 했습니다.
+  
+```
+public void saveComment(String content) {
+    if (content.length() >= 1 && content.length() <= 25)
+        boardRepository.save(new Comment(content));
+}
+```
 
+<br/>
+<br/>
+
+----
+
+4) 로또 번호 복사 기능 <br/>
+처음에는 Java로 복사 기능을 처리하는 방법을 고민했습니다.
+
+
++ 그런데 클립보드 복사는 사용자의 브라우저에서 일어나는 동작이기 때문에 서버에서 실행되는 Java보다 JavaScript로 처리하는 것이 더 적합하다고 판단했습니다.
++ 화면에 출력된 번호를 선택해 텍스트만 추출하고, 공백으로 연결한 뒤 클립보드에 저장하도록 구현했습니다.
+  
+```
+const numbers = Array.from(document.querySelectorAll(".second h1"))
+    .map(el => el.textContent.trim());
+
+const numbersString = numbers.join(" ");
+navigator.clipboard.writeText(numbersString).then(() => {
+    alert("럭키 로또 숫자 복사 완료!");
+}).catch(err => {
+    console.error("복사 실패:", err);
+    alert("복사에 실패했습니다.");
+});
+```
+
+<br/><br/>
+
+
+### 🔶 아쉬운 점 및 개선 방향
+
+1) 로또 번호 생성 로직 (수정완료) <br/>
+
++ 현재 로또 번호 생성 기능은 @GetMapping과 @PutMapping에서 같은 로직이 반복되고 있는 점을 발견했습니다. <br/>
++ 하지만 로또 번호는 단순히 생성해서 화면에 보여주는 기능입니다. <br/>
++ 서버 데이터를 수정하는 동작이 아니기 때문에, 하나의 @GetMapping만으로도 충분히 처리할 수 있습니다.<br/>
+
+<br/>
+
+2) 오래된 댓글 관리 기능 부재 <br/>
+
++ 현재 댓글은 Pageable을 사용해 최신 댓글 10개만 조회합니다.
++ 하지만 오래된 댓글을 삭제하거나 관리하는 기능은 없기 때문에, 댓글이 계속 작성되면 DB에는 데이터가 누적됩니다.
++ 현재 프로젝트는 실제 서버를 운영할 목적이 아니었기 때문에 이 부분까지 구현하지 않았습니다.
++ 만약 실제 운영 환경이라면 오래된 댓글을 삭제하거나 관리자 삭제 기능을 추가할 필요가 있습니다. <br/>
+
+<br/>
+
+3) 댓글 입력갑 검증 보완 (수정완료) <br/>
+
++ 현재는 댓글 길이가 1자 이상 25자 이하일 때만 저장되도록 처리했습니다.
++ 다만 content가 null이거나 공백만 입력된 경우까지 고려하면 더 안전한 코드가 될 수 있습니다.
+
+
+<br/><br/>
 
 
 
