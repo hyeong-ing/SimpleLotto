@@ -5,10 +5,7 @@ import com.LottoWeb.LuckyLotto.DB.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class BoardService {
@@ -20,8 +17,15 @@ public class BoardService {
     }
 
     public void saveComment(String content) {
-        if( content.length() >= 1 && content.length() <= 25 )
-            boardRepository.save(new Comment(content));
+        if (content == null) {
+            return;
+        }
+
+        String trimmedContent = content.trim();
+
+        if (trimmedContent.length() >= 1 && trimmedContent.length() <= 25) {
+            boardRepository.save(new Comment(trimmedContent));
+        }
     }
 
 
