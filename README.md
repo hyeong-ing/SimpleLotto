@@ -203,7 +203,7 @@ navigator.clipboard.writeText(numbersString).then(() => {
 
 <br/>
 
-3) 댓글 입력갑 검증 보완 (수정완료) <br/>
+3) 댓글 입력값 검증 보완 (수정완료) <br/>
 
 + 현재는 댓글 길이가 1자 이상 25자 이하일 때만 저장되도록 처리했습니다.
 + 다만 content가 null이거나 공백만 입력된 경우까지 고려하면 더 안전한 코드가 될 수 있습니다.
