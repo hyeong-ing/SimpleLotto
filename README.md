@@ -46,7 +46,7 @@
 </br></br>
 
 
-### 🔶 프로젝트 구조
+### 🔶 기술 스택 & 라이브러리
 + Java 17
 + Spring Boot MVC
 + Thymeleaf
