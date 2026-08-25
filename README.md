@@ -6,9 +6,8 @@
 <p align="center"> 
  
   <br/>
-  첫 프로젝트로 간단하게 로또 번호를 출력시키고 댓글을 남기는 기능을 만들었습니다. <br/>
-  지금 보니 너무나도 엉성하고 부족한 부분이 많이 보여 부끄럽습니다. <br/>
-  그래도 발전해나가는 그 과정 중 첫 시작이라고 생각해주시면 감사하겠습니다. <br/>
+  Spring MVC의 요청과 응답 흐름을 이해하기 위해 만든 첫 웹 프로젝트입니다. <br/>
+  로또 번호 생성과 댓글 기능을 직접 구현하며 Controller, Service, Repository의 역할과 서버 렌더링 흐름을 학습했습니다. <br/>
   <br/> <br/>
  
 <img width="700" height="400" alt="5" src="https://github.com/user-attachments/assets/b1a6e070-3d39-4770-8e1e-488c9cf048fc" />
@@ -37,10 +36,11 @@
   
 <br/>
 
-+ 사용자가 버튼을 클릭하면 로또 번호 6개를 랜덤으로 생성합니다.
-+ 사용자는 생성된 번호를 복사할 수 있습니다.
-+ JPA와 H2 데이터베이스를 이용해 댓글 데이터를 저장합니다.
-+ Spring Boot MVC와 Thymeleaf를 활용해 서버에서 화면을 렌더링합니다.
++ 버튼을 클릭하면 중복되지 않는 로또 번호 6개를 생성합니다.
++ 생성된 번호를 클립보드에 복사할 수 있습니다.
++ 댓글을 작성하면 H2 Database에 저장합니다.
++ 댓글 화면에는 가장 최근에 작성된 댓글 10개를 표시합니다.
++ Spring Boot MVC와 Thymeleaf를 사용해 서버에서 데이터를 전달하고 화면을 렌더링합니다.
 
 
 </br></br>
@@ -49,30 +49,33 @@
 ### 🔶 기술 스택 & 라이브러리
 + Java 17
 + Spring Boot 3.3.5
++ Spring Data JPA
 + Thymeleaf
 + H2 Database
++ JavaScript
 
 
 </br></br>
 
 
 ### 🔶 프로젝트 목표
-+ Spring MVC의 기본 요청과 응답 흐름을 이해하기
-+ Controller, Service, Repository, Entity 역할 나누기
-+ Controller에서 요청을 받고, Service에서 로직을 처리하고 Model을 통해 Thymeleaf 화면으로 데이터 전달하기
-+ @GetMapping과 @PostMapping이 어떻게 다르게 동작하는지 이해하기
++ Spring MVC의 기본적인 요청과 응답 흐름 이해하기
++ Controller, Service, Repository, Entity의 역할 구분하기
++ Service에서 처리한 데이터를 Model을 통해 Thymeleaf 화면으로 전달하기
++ GET과 POST 요청이 각각 어떤 상황에서 사용되는지 이해하기
++ JPA를 활용해 데이터를 저장하고 조회하는 흐름 경험하기
 
 
 </br></br>
 
 
-### 🔶 핵심 로직 및 문제 해결
-1) 로또 번호 개별 출력 문제 <br/>
-로또 번호는 중복 없이 6개를 생성해야 하고, 화면에서는 각 번호를 원형 영역 안에 하나씩 출력해야 했습니다.
+### 🔶 핵심 구현과 배운 점
+1) 중복 없는 로또 번호 생성과 화면 전달 <br/>
+로또 번호는 1부터 45 사이에서 중복 없이 6개를 생성해야 했고, 화면에서는 번호를 각각 원형 UI에 표시해야 했습니다.
 
 <br/>
 
-+ 처음에는 중복 제거와 오름차순 정렬을 동시에 처리하기 위해 TreeSet을 사용했습니다.
++ 처음에는 중복 제거와 오름차순 정렬을 처리하기 위해 TreeSet을 사용했습니다.
 
 ```
 Set<Integer> lottoSet = new TreeSet<>();
@@ -83,9 +86,8 @@ while (lottoSet.size() < 6) {
 
 <br/>
 
-+ 하지만 `TreeSet`은 인덱스로 접근할 수 없다는 특징 때문에 생성된 번호를 하나씩 분리해 화면에 전달하기 어려웠습니다.
-+ 이를 해결하기 위해 `TreeSet`을 `ArrayList`로 변환한 뒤, 각 번호를 Model에 담아 Thymeleaf 화면으로 전달했습니다.
-
++ `TreeSet`은 중복 제거와 정렬에는 편리했지만 인덱스로 값을 가져올 수 없었습니다.
++ 당시에는 화면의 각 영역에 번호를 하나씩 전달하기 위해 `ArrayList`로 변환한 뒤 Model에 값을 담았습니다.
 ```
 List<Integer> lottoList = new ArrayList<>(lottoSet);
 ```
@@ -97,25 +99,20 @@ model.addAttribute("Number3",lottoList.get(2));
 ```
 
 <br/>
+
++ 이 구현을 통해 자료구조마다 제공하는 기능과 접근 방식이 다르다는 점을 직접 경험할 수 있었습니다.
++ 현재 다시 구현한다면 각 번호를 별도의 Model 값으로 전달하기보다, 번호 목록 자체를 전달하고 Thymeleaf 반복문으로 출력하는 방식으로 더 단순하게 구성할 수 있습니다.
+
 <br/>
 
 ----
 
 2) 최신 댓글 10개만 조회하기 <br/>
-전체 댓글을 가져온 뒤 화면에서 10개만 보여주는 방식을 생각했지만, 조회 단계에서부터 필요한 데이터만 가져오는 것이 더 효율적이라고 생각했습니다.
+전체 댓글을 조회한 뒤 화면에서 10개만 보여주는 방식도 생각했지만, 사용하지 않을 데이터까지 DB에서 가져올 필요가 없다고 판단했습니다.
 
 <br/>
 
-+ 그래서 Spring Data JPA의 `Pageable`을 사용해 최신 댓글 10개만 조회하도록 구현했습니다.
-  
-```
-@GetMapping("/board")
-public String boardPage(Model model) {
-    model.addAttribute("comments", boardService.get10Comments());
-    return "board";
-}
-```
-+ `PageRequest.of(0, 10)`으로 조회 개수를 10개로 제한하고, ID 기준 내림차순 정렬을 사용해 최신 댓글부터 가져오도록 했습니다.
++ 그래서 Spring Data JPA의 `Pageable`을 사용해 조회 단계에서부터 10개만 가져오도록 구현했습니다.
 
 ```
 public Page<Comment> get10Comments() {
@@ -124,62 +121,44 @@ public Page<Comment> get10Comments() {
 }
 ```
 ```
-public interface BoardRepository extends JpaRepository<Comment, Long> { Page<Comment> findAllByOrderByIdDesc(Pageable pageable); }
-```
-
-<br/>
-<br/>
-
-----
-
-3) 댓글 길이 검증 <br/>
-댓글은 짧은 한 줄 댓글 형태로 사용하기 위해 1자 이상 25자 이하만 저장되도록 제한했습니다.
-
-<br/>
-
-+ 화면에서는 maxlength를 사용해 입력 길이를 제한했습니다.
-
-``` 
-<input class="write"
-       type="text"
-       name="content"
-       placeholder="짧은 댓글 남기기 (25자이내)"
-       maxlength="25">
-```
-
-+ 서버에서도 한 번 더 길이를 검증해 조건에 맞는 댓글만 저장하도록 했습니다.
-  
-```
-public void saveComment(String content) {
-    if (content.length() >= 1 && content.length() <= 25)
-        boardRepository.save(new Comment(content));
+public interface BoardRepository extends JpaRepository<Comment, Long> {
+    Page<Comment> findAllByOrderByIdDesc(Pageable pageable);
 }
 ```
 
 <br/>
+
++ 이를 통해 화면에서 데이터를 잘라내는 것과 DB 조회 자체를 제한하는 것은 다르다는 점을 배울 수 있었습니다.
+
 <br/>
+
 
 ----
 
-4) 로또 번호 복사 기능 <br/>
-처음에는 Java로 복사 기능을 처리하는 방법을 고민했습니다.
+3) 브라우저와 서버의 역할 구분 <br/>
 
-
-+ 그런데 클립보드 복사는 사용자의 브라우저에서 일어나는 동작이기 때문에 서버에서 실행되는 Java보다 JavaScript로 처리하는 것이 더 적합하다고 판단했습니다.
-+ 화면에 출력된 번호를 선택해 텍스트만 추출하고, 공백으로 연결한 뒤 클립보드에 저장하도록 구현했습니다.
++ 생성된 로또 번호를 복사하는 기능을 처음 구현할 때는 Java에서 처리하는 방법을 고민했습니다.
++ 하지만 클립보드는 사용자의 브라우저에서 동작하는 기능이기 때문에 서버에서 실행되는 Java보다 브라우저에서 실행되는 JavaScript가 담당하는 것이 적절하다고 판단했습니다.
   
 ```
 const numbers = Array.from(document.querySelectorAll(".second h1"))
     .map(el => el.textContent.trim());
 
 const numbersString = numbers.join(" ");
-navigator.clipboard.writeText(numbersString).then(() => {
-    alert("럭키 로또 숫자 복사 완료!");
-}).catch(err => {
-    console.error("복사 실패:", err);
-    alert("복사에 실패했습니다.");
-});
 ```
+
++ 반대로 댓글처럼 서버에 저장되는 데이터는 브라우저의 입력 제한만 신뢰하지 않고 서버에서도 한 번 더 검증하도록 구현했습니다.
+
+```
+public void saveComment(String content) {
+    if (content.length() >= 1 && content.length() <= 25) {
+        boardRepository.save(new Comment(content));
+    }
+}
+```
+
++ 이 과정에서 기능의 위치를 정할 때 단순히 `어떤 언어로 구현할 수 있는가`가 아니라 `어디에서 실행되어야 하는 기능인가`를 구분해야 한다는 점​을 배웠습니다. 
+
 
 <br/><br/>
 
