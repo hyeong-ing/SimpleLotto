@@ -1,0 +1,84 @@
+.write {
+    height:30px;
+    width:500px;
+    margin-top:30px;
+    background:white;
+    border-radius:30px;
+    padding:20px;
+    border:2px solid;
+    font-size:23px;
+    color:#088A29;
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+}
+
+.save {
+    background-color: #AC72E5;
+    color:white;
+    width:60px;
+    height:45px;
+    border:none;
+    border-radius:15px;
+    margin-top :30px;
+    margin-left:10px;
+    font-size:20px;
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+}
+
+.return {
+    background-color: #298A08;
+        color:white;
+        width:80px;
+        height:45px;
+        border:none;
+        border-radius:15px;
+        margin-top :30px;
+        margin-left:10px;
+        font-size:20px;
+        font-family: 'HakgyoansimDunggeunmisoTTF-B';
+
+}
+
+body {
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+}
+
+
+.first {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 70px;
+    margin-bottom: 70px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.commentBox {
+    text-align: left;
+    margin-top:30px;
+    margin-bottom:20px;
+    padding-bottom:10px;
+    padding-left:30px;
+    padding-right:30px;
+
+}
+
+.font {
+    font-size:25px;
+}
+
+.blank {
+    margin-top:30px;
+    margin-bottom:20px;
+}
+
+.center {
+    text-align: center;
+}
+
+@font-face {
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-5@1.0/HakgyoansimDunggeunmisoTTF-B.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}

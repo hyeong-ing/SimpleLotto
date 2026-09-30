@@ -1,0 +1,131 @@
+
+.btn {
+    background-color: #AC72E5;
+    color: white;
+    border: none;
+    border-radius:20px;
+    width:200px;
+    height:60px;
+    font-size:40px;
+    margin-left: 10px;
+    margin-right:8px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+}
+
+.image {
+    width:40px;
+    height:40px;
+}
+
+
+body {
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+}
+
+
+.first {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 70px;
+    margin-bottom: 70px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.second {
+    margin-top: 100px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.third {
+    margin-top: 130px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    justify-content: center;
+    align-items: center;
+    display:flex;
+}
+
+.fourth {
+    margin-top: 310px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    justify-content: center;
+    align-items: center;
+    display:flex;
+}
+
+
+.center {
+    text-align: center;
+}
+
+.circle-red {
+    display:inline-block;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background-color:#F5A9A9;
+    text-align:center;
+}
+
+.circle-orange {
+    display:inline-block;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background-color:#F79F81;
+    text-align:center;
+}
+
+.circle-yellow {
+    display:inline-block;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background-color:#F6E074;
+    text-align:center;
+}
+
+.circle-green {
+    display:inline-block;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background-color:#BEF781;
+    text-align:center;
+}
+
+.circle-blue {
+    display:inline-block;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background-color:#A9E2F3;
+    text-align:center;
+}
+
+.circle-darkblue {
+    display:inline-block;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background-color:#A9A9F5;
+    text-align:center;
+}
+
+
+
+@font-face {
+    font-family: 'HakgyoansimDunggeunmisoTTF-B';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-5@1.0/HakgyoansimDunggeunmisoTTF-B.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}

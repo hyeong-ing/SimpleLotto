@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>한 줄 남기기</title>
+    <link rel="stylesheet" href="css/board.css" type="text/css">
+</head>
+
+<body>
+
+<div class="first">
+    <div class="center">
+
+        <img th:src="@{/css/lucky.png}" alt="Lucky">
+        <img th:src="@{/css/lucky.png}" alt="Lucky">
+        <img th:src="@{/css/lucky.png}" alt="Lucky">
+
+        <h1> <b> 댓글 남기기 </b> </h1>
+
+        <form th:action="@{/board/comments}" method="post">
+            <input class="write" type="text" name="content" placeholder ="짧은 댓글 남기기 (25자이내)" maxlength="25">
+            <button class="save" type="submit"> 저장 </button>
+        </form>
+
+        <div class="blank">
+            <h3>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </h3>
+        </div>
+
+        <div class="commentBox">
+            <li class="font" th:each="comment : ${comments}"  th:text="${comment.content}">
+                comment
+            </li>
+        </div>
+
+        <form th:action="@{/home}" method="get">
+            <button class="return" type="submit"> HOME </button>
+        </form>
+
+
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>럭키비키 로또</title>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+</head>
+
+<body>
+
+<div class="first">
+    <div class="center">
+        <img th:src="@{/css/lucky.png}" alt="Lucky">
+        <img th:src="@{/css/lucky.png}" alt="Lucky">
+        <img th:src="@{/css/lucky.png}" alt="Lucky">
+
+        <h1> <b> 행운의 로또 번호 </b> </h1>
+        <h1> Lotto 6/45</h1>
+
+        <div class="fourth">
+
+            <a th:href="@{/board}">
+                <img src="css/comment.png" alt="comment" class="image">
+            </a>
+
+            <form th:action="@{/Random1}" method = "get">
+                <button class="btn" type="submit" > 버튼 </button>
+            </form>
+
+            <img src="css/copy.png" alt="copy" class="image">
+
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
